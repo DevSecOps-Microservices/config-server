@@ -42,7 +42,10 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
 
       - name: Dependency scan (Snyk)
-        uses: snyk/actions/maven@master
+        run: |
+          npm install -g snyk
+          snyk auth ${{ secrets.SNYK_TOKEN }}
+          snyk test --all-projects
         continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
@@ -57,7 +60,7 @@ jobs:
           -Dsonar.host.url=https://sonarcloud.io
 
       - name: Run unit tests
-        run: mvn test -Dtest="!ConfigServerApplicationTest"
+        run: mvn test -Dsurefire.failIfNoSpecifiedTests=false
         continue-on-error: true
 
       - name: Build Docker image
