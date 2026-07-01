@@ -105,7 +105,11 @@ jobs:
             --name config-server \
             -p 8888:8888 \
             --restart unless-stopped \
-            -e SPRING_PROFILES_ACTIVE=docker \
+            -e SPRING_PROFILES_ACTIVE=git,vault \
+            -e GIT_TOKEN=${{ secrets.GIT_TOKEN }} \
+            -e VAULT_ADDR=${{ secrets.VAULT_ADDR }} \
+            -e VAULT_PORT=${{ secrets.VAULT_PORT }} \
+            -e VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} \
             ghcr.io/devsecops-microservices/config-server:latest
           sleep 15
           echo "config-server deployed successfully"
