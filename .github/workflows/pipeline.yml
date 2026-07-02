@@ -41,18 +41,8 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
 
-      - name: Run Snyk Scan
-        run: |
-          npm install -g snyk
-          snyk auth ${{ secrets.SNYK_TOKEN }}
-          mvn dependency:tree -DoutputFile=dependency-tree.txt -DskipTests
-          snyk test --file=dependency-tree.txt --package-manager=maven
-        continue-on-error: true
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-          JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.19-10/x64
-          SNYK_MAVEN_COMMAND: mvn
-          MAVEN_OPTS: "-Xmx1g"
+      - name: Dependency scan (Snyk)
+        run: echo "Snyk scanning handled via Snyk GitHub Integration at app.snyk.io"
 
       - name: Build and analyze with SonarCloud
         env:
