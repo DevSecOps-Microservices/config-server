@@ -41,14 +41,19 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
 
+      - name: Build dependency tree for Snyk
+        run: mvn dependency:resolve -DskipTests
+
       - name: Dependency scan (Snyk)
         run: |
           npm install -g snyk
           snyk auth ${{ secrets.SNYK_TOKEN }}
-          snyk test --all-projects
+          snyk test --package-manager=maven --file=pom.xml
         continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          JAVA_HOME: ${{ env.JAVA_HOME }}
+          MAVEN_OPTS: "-Xmx512m"
 
       - name: Build and analyze with SonarCloud
         env:
