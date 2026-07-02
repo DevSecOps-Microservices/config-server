@@ -46,14 +46,13 @@ jobs:
           npm install -g snyk
           snyk auth ${{ secrets.SNYK_TOKEN }}
           mvn dependency:tree -DoutputFile=dependency-tree.txt -DskipTests
-          snyk test --file=pom.xml --package-manager=maven
+          snyk test --file=dependency-tree.txt --package-manager=maven
         continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.19-10/x64
           SNYK_MAVEN_COMMAND: mvn
           MAVEN_OPTS: "-Xmx1g"
-          JAVA_OPTS: "-Xmx1g"
 
       - name: Build and analyze with SonarCloud
         env:
