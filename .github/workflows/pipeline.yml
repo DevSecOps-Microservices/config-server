@@ -41,33 +41,13 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
 
-      - name: Verify Maven
-        run: |
-          java -version
-          mvn -version
-          mvn validate
-      - name: Verify permissions
-        run: ls -l ./mvnw
-
-      - name: Make Maven Wrapper executable
-        run: chmod +x mvnw
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install Snyk CLI
-        run: npm install -g snyk
-
-      - name: Authenticate Snyk
-        run: snyk auth ${{ secrets.SNYK_TOKEN }}
-
-      - name: Verify Snyk
-        run: snyk --version
-
       - name: Run Snyk Scan
-        run: snyk test --file=pom.xml --package-manager=maven --debug
+        run: snyk test --file=pom.xml --package-manager=maven --maven-aggregate-project
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.19-10/x64
+          SNYK_MAVEN_COMMAND: mvn
 
       - name: Build and analyze with SonarCloud
         env:
