@@ -46,14 +46,28 @@ jobs:
           java -version
           mvn -version
           mvn validate
+      - name: Verify permissions
+        run: ls -l ./mvnw
 
-      - name: Snyk Scan
-        uses: snyk/actions/maven@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      - name: Make Maven Wrapper executable
+        run: chmod +x mvnw
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          command: test
-          args: --debug
+          node-version: 20
+
+      - name: Install Snyk CLI
+        run: npm install -g snyk
+
+      - name: Authenticate Snyk
+        run: snyk auth ${{ secrets.SNYK_TOKEN }}
+
+      - name: Verify Snyk
+        run: snyk --version
+
+      - name: Run Snyk Scan
+        run: snyk test --file=pom.xml --package-manager=maven --debug
 
       - name: Build and analyze with SonarCloud
         env:
