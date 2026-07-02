@@ -42,7 +42,10 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
 
       - name: Run Snyk Scan
-        run: snyk test --file=pom.xml --package-manager=maven --maven-aggregate-project
+        run: |
+          npm install -g snyk
+          snyk auth ${{ secrets.SNYK_TOKEN }}
+          snyk test --file=pom.xml --package-manager=maven --maven-aggregate-project
         continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
