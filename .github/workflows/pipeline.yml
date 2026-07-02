@@ -41,16 +41,19 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
 
-      - name: Dependency scan (Snyk)
+      - name: Verify Maven
         run: |
-          npm install -g snyk
-          snyk auth ${{ secrets.SNYK_TOKEN }}
-          snyk test --package-manager=maven --file=pom.xml
-        continue-on-error: true
+          java -version
+          mvn -version
+          mvn validate
+
+      - name: Snyk Scan
+        uses: snyk/actions/maven@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-          JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.19-10/x64
-          MAVEN_OPTS: "-Xmx1g"
+        with:
+          command: test
+          args: --debug
 
       - name: Build and analyze with SonarCloud
         env:
