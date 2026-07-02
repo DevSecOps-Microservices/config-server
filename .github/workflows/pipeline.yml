@@ -17,48 +17,77 @@ jobs:
 
     steps:
 
+      ####################################################
+      # Checkout
+      ####################################################
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      ####################################################
+      # Secret Scanning
+      ####################################################
+
       - name: Secret detection (GitLeaks)
         run: |
           wget -q https://github.com/gitleaks/gitleaks/releases/download/v8.18.2/gitleaks_8.18.2_linux_x64.tar.gz
           tar -xzf gitleaks_8.18.2_linux_x64.tar.gz
+          chmod +x gitleaks
           ./gitleaks detect --source . --verbose --no-git
         continue-on-error: true
+
+      ####################################################
+      # Java Setup
+      ####################################################
 
       - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
+          distribution: temurin
           java-version: '17'
-          distribution: 'temurin'
+          cache: maven
 
-      - name: Cache Maven packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+      ####################################################
+      # Build + Unit Tests
+      ####################################################
 
-      - name: Dependency scan (Snyk)
-        run: echo "Snyk scanning handled via Snyk GitHub Integration at app.snyk.io"
+      - name: Build & Verify
+        run: mvn clean verify
 
-      - name: Build and analyze with SonarCloud
+      ####################################################
+      # SonarCloud
+      ####################################################
+
+      - name: SonarCloud Analysis
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn clean package -DskipTests sonar:sonar
-          -Dsonar.projectKey=DevSecOps-Microservices_config-server
-          -Dsonar.organization=devsecops-microservices
-          -Dsonar.host.url=https://sonarcloud.io
+        run: |
+          mvn sonar:sonar \
+            -Dsonar.projectKey=DevSecOps-Microservices_config-server \
+            -Dsonar.organization=devsecops-microservices \
+            -Dsonar.host.url=https://sonarcloud.io
 
-      - name: Run unit tests
-        run: mvn test -Dsurefire.failIfNoSpecifiedTests=false
-        continue-on-error: true
+      ####################################################
+      # Dependency Scan (Snyk)
+      ####################################################
+
+      - name: Dependency Scan (Snyk)
+        run: |
+          echo "Dependency scanning is performed by the Snyk GitHub Integration."
+
+      ####################################################
+      # Docker Build
+      ####################################################
 
       - name: Build Docker image
         run: docker build -t config-server:latest .
+
+      ####################################################
+      # Container Scan
+      ####################################################
 
       - name: Scan Docker image (Trivy)
         uses: aquasecurity/trivy-action@master
@@ -66,20 +95,24 @@ jobs:
           image-ref: config-server:latest
           format: table
           exit-code: '0'
-          severity: CRITICAL,HIGH
+          severity: HIGH,CRITICAL
 
-      - name: Trivy SARIF report
+      - name: Generate Trivy SARIF
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: config-server:latest
           format: sarif
           output: trivy-results.sarif
-          severity: CRITICAL,HIGH
+          severity: HIGH,CRITICAL
 
-      - name: Upload Trivy to GitHub Security
+      - name: Upload Trivy Report
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: trivy-results.sarif
+
+      ####################################################
+      # Push Image
+      ####################################################
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -92,6 +125,10 @@ jobs:
         run: |
           docker tag config-server:latest ghcr.io/devsecops-microservices/config-server:latest
           docker push ghcr.io/devsecops-microservices/config-server:latest
+
+      ####################################################
+      # Deployment (Keep as-is for now)
+      ####################################################
 
       - name: Deploy config-server
         run: |
@@ -108,7 +145,9 @@ jobs:
             -e VAULT_PORT=${{ secrets.VAULT_PORT }} \
             -e VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} \
             ghcr.io/devsecops-microservices/config-server:latest
+
           sleep 15
+
           echo "config-server deployed successfully"
 
       - name: Verify deployment
