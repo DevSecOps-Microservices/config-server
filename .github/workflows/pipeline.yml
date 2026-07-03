@@ -101,20 +101,14 @@ jobs:
       ####################################################
       # Dependency Scan
       ####################################################
-      - name: Test Maven Dependency Tree
-        run: |
-          ./mvnw dependency:tree -X
+      - name: Make Maven Wrapper executable
+        run: chmod +x mvnw
 
-      - name: Snyk Debug
+      - name: Dependency scan (Snyk)
+        uses: snyk/actions/maven@master
+        continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        run: |
-          snyk test \
-            --file=pom.xml \
-            --package-manager=maven \
-            --print-deps \
-            --debug
-
       ####################################################
       # Docker Build
       ####################################################
