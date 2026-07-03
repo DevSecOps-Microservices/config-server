@@ -79,6 +79,48 @@ jobs:
           echo "Dependency scanning is performed by the Snyk GitHub Integration."
 
       ####################################################
+      # Setup Node (Required by Snyk CLI)
+      ####################################################
+
+      - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+      ####################################################
+      # Install Snyk
+      ####################################################
+
+      - name: Install Snyk CLI
+      run: |
+        npm install -g snyk
+        snyk --version
+
+      ####################################################
+      # Authenticate
+      ####################################################
+
+      - name: Authenticate Snyk
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      run: |
+        snyk auth $SNYK_TOKEN
+        snyk whoami
+
+      ####################################################
+      # Dependency Scan
+      ####################################################
+
+      - name: Snyk Dependency Scan
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      run: |
+        snyk test \
+        --file=pom.xml \
+        --package-manager=maven \
+        --severity-threshold=high
+
+      ####################################################
       # Docker Build
       ####################################################
 
