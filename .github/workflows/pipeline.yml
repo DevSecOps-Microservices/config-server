@@ -96,12 +96,14 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: |
-          snyk auth $SNYK_TOKEN
           snyk whoami
 
       ####################################################
       # Dependency Scan
       ####################################################
+      - name: Test Maven Dependency Tree
+        run: |
+          ./mvnw dependency:tree -X
 
       - name: Snyk Debug
         env:
