@@ -103,16 +103,15 @@ jobs:
       # Dependency Scan
       ####################################################
 
-      - name: Verify Maven Wrapper
+      - name: Snyk Debug
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: |
-          echo "===== Wrapper Files ====="
-          ls -R .mvn
-
-          echo "===== Permissions ====="
-          chmod +x mvnw
-
-          echo "===== Wrapper Version ====="
-          ./mvnw --version
+          snyk test \
+            --file=pom.xml \
+            --package-manager=maven \
+            --print-deps \
+            --debug
 
       ####################################################
       # Docker Build
