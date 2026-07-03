@@ -110,11 +110,12 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: |
           ./mvnw dependency:tree
-        snyk test \
-          --file=pom.xml \
-          --package-manager=maven \
-          --severity-threshold=high \
-          --debug
+          snyk test \
+            --file=pom.xml \
+            --package-manager=maven \
+            --severity-threshold=high \
+            --print-deps \
+            --debug
 
       ####################################################
       # Docker Build
