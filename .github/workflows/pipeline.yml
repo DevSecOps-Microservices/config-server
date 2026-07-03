@@ -26,6 +26,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Make Maven Wrapper Executable
+        run: chmod +x mvnw
+
       ####################################################
       # Secret Scanning
       ####################################################
@@ -101,14 +104,21 @@ jobs:
       ####################################################
       # Dependency Scan
       ####################################################
-      - name: Make Maven Wrapper executable
-        run: chmod +x mvnw
+      - name: Test Maven Dependency Tree
+        run: |
+          
+          ./mvnw dependency:tree -X
 
-      - name: Dependency scan (Snyk)
-        uses: snyk/actions/maven@master
-        continue-on-error: true
+      - name: Snyk Debug
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: |
+          snyk test \
+            --file=pom.xml \
+            --package-manager=maven \
+            --print-deps \
+            --debug
+
       ####################################################
       # Docker Build
       ####################################################
