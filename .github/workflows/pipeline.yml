@@ -71,14 +71,6 @@ jobs:
             -Dsonar.host.url=https://sonarcloud.io
 
       ####################################################
-      # Dependency Scan (Snyk)
-      ####################################################
-
-      - name: Dependency Scan (Snyk)
-        run: |
-          echo "Dependency scanning is performed by the Snyk GitHub Integration."
-
-      ####################################################
       # Setup Node (Required by Snyk CLI)
       ####################################################
 
