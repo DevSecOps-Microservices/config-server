@@ -105,12 +105,18 @@ jobs:
       - name: Make Maven Wrapper executable
         run: chmod +x mvnw
 
-      - name: Dependency scan (Snyk)
-        uses: snyk/actions/maven@master
-        continue-on-error: true
+      - name: Snyk Dependency Scan
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-          JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.19-10/x64
+        run: |
+          ./mvnw dependency:tree
+
+        snyk test \
+          --file=pom.xml \
+          --package-manager=maven \
+          --severity-threshold=high \
+          --print-deps \
+          --debug
 
       ####################################################
       # Docker Build
