@@ -194,10 +194,3 @@ jobs:
         run: |
           docker ps | grep config-server
           echo "Container is running"
-
-      - name: Verify Vault Connection
-        run: |
-          curl -s -H "X-Vault-Token: ${{ secrets.VAULT_TOKEN }}" \
-          -H "ngrok-skip-browser-warning: true" \
-          ${{ secrets.VAULT_ADDR }}/v1/secret/data/app/service-incident \
-          | jq '.data.data'
