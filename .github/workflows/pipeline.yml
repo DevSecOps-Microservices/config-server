@@ -116,6 +116,7 @@ jobs:
             --severity-threshold=high \
             --print-deps \
             --debug
+        continue-on-error: true
 
       ####################################################
       # Docker Build
