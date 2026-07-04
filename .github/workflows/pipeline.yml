@@ -198,5 +198,6 @@ jobs:
       - name: Verify Vault Connection
         run: |
           curl -s -H "X-Vault-Token: ${{ secrets.VAULT_TOKEN }}" \
-          ${{ secrets.VAULT_ADDR }}/v1/secret/app/postgres/service-incident \
+          -H "ngrok-skip-browser-warning: true" \
+          ${{ secrets.VAULT_ADDR }}/v1/secret/data/app/service-incident \
           | jq '.data.data'
