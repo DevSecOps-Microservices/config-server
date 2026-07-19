@@ -119,28 +119,3 @@ jobs:
         run: |
           docker tag config-server:latest ghcr.io/devsecops-microservices/config-server:latest
           docker push ghcr.io/devsecops-microservices/config-server:latest
-
-      - name: Deploy config-server
-        run: |
-          docker stop config-server || true
-          docker rm config-server || true
-          docker pull ghcr.io/devsecops-microservices/config-server:latest
-          docker run -d \
-            --name config-server \
-            -p 8888:8888 \
-            --restart unless-stopped \
-            -e SPRING_PROFILES_ACTIVE=git,vault \
-            -e GIT_TOKEN=${{ secrets.GIT_TOKEN }} \
-            -e VAULT_ADDR=${{ secrets.VAULT_ADDR }} \
-            -e VAULT_PORT=${{ secrets.VAULT_PORT }} \
-            -e VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} \
-            ghcr.io/devsecops-microservices/config-server:latest
-
-          sleep 15
-
-          echo "config-server deployed successfully"
-
-      - name: Verify deployment
-        run: |
-          docker ps | grep config-server
-          echo "Container is running"
