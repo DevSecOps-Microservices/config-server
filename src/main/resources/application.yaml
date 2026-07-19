@@ -2,13 +2,26 @@ spring:
   application:
     name: config-server
 
+  profiles:
+    active: git, vault
+
   cloud:
     config:
       server:
         git:
-          uri: https://github.com/Abderrazak111/microservices-project.git
-          search-paths: Desktop/microservices-project/config-repo
-          default-label: Test
+          uri: https://${GIT_TOKEN}@github.com/DevSecOps-Microservices/config-repo.git
+          default-label: main
+          clone-on-start: true
+          search-paths: "."
+        vault:
+          host: ${VAULT_HOST:localhost}
+          port: ${VAULT_PORT:8200}
+          scheme: http
+          authentication: TOKEN
+          token: ${VAULT_TOKEN}
+          kv-version: 2
+          default-backend: secret
+          path-to-key: app
 
 server:
   port: 8888
@@ -16,7 +29,7 @@ server:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://eureka-service:8761/eureka
 
 # Actuator
 management:
