@@ -9,7 +9,9 @@ spring:
     config:
       server:
         git:
-          uri: https://${GIT_TOKEN}@github.com/DevSecOps-Microservices/config-repo.git
+          uri: https://github.com/DevSecOps-Microservices/config-repo.git
+          username: ${GIT_USERNAME}
+          password: ${GIT_TOKEN}
           default-label: main
           clone-on-start: true
           search-paths: "."
