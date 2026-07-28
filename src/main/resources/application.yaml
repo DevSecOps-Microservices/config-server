@@ -16,8 +16,7 @@ spring:
           clone-on-start: true
           search-paths: "."
         vault:
-          host: ${VAULT_ADDR}
-          scheme: https
+          uri: ${VAULT_ADDR}
           authentication: TOKEN
           token: ${VAULT_TOKEN}
           kv-version: 2
