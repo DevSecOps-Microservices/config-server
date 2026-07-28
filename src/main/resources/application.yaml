@@ -18,7 +18,7 @@ spring:
         vault:
           host: ${VAULT_ADDR:localhost}
           port: ${VAULT_PORT:8200}
-          scheme: http
+          scheme: https
           authentication: TOKEN
           token: ${VAULT_TOKEN}
           kv-version: 2
