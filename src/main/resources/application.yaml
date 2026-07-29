@@ -6,6 +6,10 @@ spring:
     active: git, vault
 
   cloud:
+    vault:
+      uri: ${VAULT_ADDR}
+      token: ${VAULT_TOKEN}
+      
     config:
       server:
         git:
@@ -16,9 +20,6 @@ spring:
           clone-on-start: true
           search-paths: "."
         vault:
-          uri: ${VAULT_ADDR}
-          authentication: TOKEN
-          token: ${VAULT_TOKEN}
           kv-version: 2
           default-backend: secret
           path-to-key: app
