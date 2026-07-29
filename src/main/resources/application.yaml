@@ -8,6 +8,7 @@ spring:
   cloud:
     vault:
       uri: ${VAULT_ADDR}
+      authentication: TOKEN
       token: ${VAULT_TOKEN}
 
     config:
