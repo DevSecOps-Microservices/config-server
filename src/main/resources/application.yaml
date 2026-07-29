@@ -9,7 +9,7 @@ spring:
     vault:
       uri: ${VAULT_ADDR}
       token: ${VAULT_TOKEN}
-      
+
     config:
       server:
         git:
@@ -41,7 +41,8 @@ management:
 
   endpoint:
     health:
-      show-details: always
+      config:
+        enabled: false
 
   metrics:
     tags:
