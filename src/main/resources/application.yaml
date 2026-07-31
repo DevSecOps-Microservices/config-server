@@ -22,7 +22,7 @@ spring:
           authentication: TOKEN
           token: ${VAULT_TOKEN}
           kv-version: 2
-          backend: app
+          backend: secret
           default-key: application
 
 server:
