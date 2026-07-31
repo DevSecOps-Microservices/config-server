@@ -22,8 +22,8 @@ spring:
           authentication: TOKEN
           token: ${VAULT_TOKEN}
           kv-version: 2
-          backend: secret
-          default-key: app
+          backend: app
+          default-key: application
 
 server:
   port: 8888
